@@ -24,7 +24,7 @@ The sensor `jumbo_basket` indicates how many items you still have within your ba
 #### Orders
 The sensor `jumbo_orders` indicates when your next order is expected. Within the attributes, you can also see any future orders.
 
-## Debugging
+### Debugging
 If you experience unexpected output, please create an issue with additional logging. You can add the following lines to enable logging
 
 ```
