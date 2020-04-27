@@ -3,5 +3,5 @@
   "name": "Jumbo Sensor",
   "documentation": "https://github.com/peternijssen/python-jumbo-api",
   "codeowners": ["@peternijssen"],
-  "requirements": ["python-jumbo-api==0.1.0"]
+  "requirements": ["python-jumbo-api==0.2.0"]
 }

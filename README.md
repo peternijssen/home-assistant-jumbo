@@ -1,7 +1,8 @@
 
 ## Home Assisant sensor component for Jumbo.com
 
-Provides Home Assistant sensors for Jumbo.com (Dutch Supermarket)
+Provides Home Assistant sensors for Jumbo (Dutch Supermarket).
+This library is not affiliated with Jumbo and retrieves data from the endpoints of the mobile application. Use at your own risk.
 
 ### Install
 Use HACS to isntall these sensors or copy the files in the /custom_components/jumbo/ folder to [homeassistant]/config/custom_components/jumbo/
@@ -33,3 +34,6 @@ logger:
   logs:
       custom_components.jumbo: debug
 ```
+
+## Contributors
+* [Peter Nijssen](https://github.com/peternijssen)

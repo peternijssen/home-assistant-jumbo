@@ -14,7 +14,7 @@ from homeassistant.const import (
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
 
-MIN_TIME_BETWEEN_UPDATES = timedelta(hours=4)
+MIN_TIME_BETWEEN_UPDATES = timedelta(hours=2)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ BASKET_NAME = "jumbo_basket"
 ORDER_ICON = "mdi:calendar-clock"
 ORDER_NAME = "jumbo_orders"
 
-VERSION = '0.1.0'
+VERSION = '0.2.0'
 
 ATTRIBUTION = "Information provided by Jumbo.com"
 
@@ -91,7 +91,7 @@ class BasketSensor(Entity):
     async def async_update(self):
         """Update the sensor."""
         await self._data.async_update()
-        
+
         self._state = self._data.basket.amount
 
     @property
@@ -141,7 +141,7 @@ class OrderSensor(Entity):
 
         if len(orders) > 0:
             first = next(iter(orders))
-            self._state = first.delivery_date
+            self._state = first.delivery_date + " " + first.delivery_time
         else:
             self._state = None
 
