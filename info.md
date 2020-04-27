@@ -8,6 +8,6 @@ Provides Home Assistant sensors for Jumbo.com (Dutch Supermarket)
   sensor:
     - platform: jumbo
       username: <username>            (required)
-      password: <username>            (required)
+      password: <password>            (required)
 ```
 [For more information visit the repository](https://github.com/peternijssen/home-asssistant-jumbo)

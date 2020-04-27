@@ -12,7 +12,7 @@ Example config:
   sensor:
     - platform: jumbo
       username: <username>            (required)
-      password: <username>            (required)
+      password: <password>            (required)
 ```
 
 ## Available sensors
