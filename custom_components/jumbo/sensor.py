@@ -14,22 +14,26 @@ from homeassistant.const import (
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
 
-MIN_TIME_BETWEEN_UPDATES = timedelta(hours=2)
+MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=60)
 
 _LOGGER = logging.getLogger(__name__)
 
 BASKET_ICON = "mdi:basket"
 BASKET_NAME = "jumbo_basket"
 
-ORDER_ICON = "mdi:calendar-clock"
+ORDER_ICON = "mdi:truck-delivery"
 ORDER_NAME = "jumbo_orders"
 
-VERSION = '0.2.0'
+TIME_SLOT_ICON = "mdi:calendar-clock"
+TIME_SLOT_NAME = "jumbo_time_slots"
+
+VERSION = '0.3.0'
 
 ATTRIBUTION = "Information provided by Jumbo.com"
 
 ATTR_ATTRIBUTION = "attribution"
 ATTR_ORDERS = "orders"
+ATTR_TIME_SLOTS = "time_slots"
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
@@ -56,16 +60,19 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 
     async_add_entities([BasketSensor(data)], True)
     async_add_entities([OrderSensor(data)], True)
+    async_add_entities([TimeSlotSensor(data)], True)
 
 
 class JumboData:
     """Handle Jumbo data object"""
+
     def __init__(self, hass, config, api):
         """Initialize the data object."""
         self._api = api
         self.basket = None
         self.open_deliveries = {}
         self.closed_deliveries = {}
+        self.open_time_slots = {}
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def async_update(self):
@@ -74,6 +81,7 @@ class JumboData:
         self.basket = self._api.get_basket()
         self.open_deliveries = self._api.get_open_deliveries()
         self.closed_deliveries = self._api.get_closed_deliveries()
+        self.open_time_slots = self._api.get_open_time_slots()
 
 
 class BasketSensor(Entity):
@@ -159,6 +167,57 @@ class OrderSensor(Entity):
     def icon(self):
         """Return the icon of the sensor."""
         return ORDER_ICON
+
+    @property
+    def device_state_attributes(self):
+        """Return the state attributes."""
+        return self._attributes
+
+
+class TimeSlotSensor(Entity):
+    """Time Slot Sensor class."""
+
+    def __init__(self, data):
+        self.attr = {}
+        self._state = None
+        self._data = data
+        self._attributes = {
+            ATTR_ATTRIBUTION: ATTRIBUTION,
+            ATTR_TIME_SLOTS: [],
+        }
+
+    @Throttle(MIN_TIME_BETWEEN_UPDATES)
+    async def async_update(self):
+        """Update the sensor."""
+        await self._data.async_update()
+
+        self._attributes[ATTR_TIME_SLOTS] = []
+        self._state = None
+
+        time_slots = self._data.open_time_slots
+        for time_slot in time_slots:
+            self._attributes[ATTR_TIME_SLOTS].append(vars(time_slot))
+
+        if len(time_slots) > 0:
+            first = next(iter(time_slots))
+            self._state = first.start_date_time
+        else:
+            self._state = None
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return TIME_SLOT_NAME
+
+    @property
+    def state(self):
+        """Return the state of the sensor."""
+        return self._state
+
+    @property
+    def icon(self):
+        """Return the icon of the sensor."""
+        return TIME_SLOT_ICON
 
     @property
     def device_state_attributes(self):

@@ -17,13 +17,16 @@ Example config:
 ```
 
 ### Usage
-Two sensors will be created:
+Three sensors will be created:
 
 #### Basket
 The sensor `jumbo_basket` indicates how many items you still have within your basket at this point.
 
 #### Orders
-The sensor `jumbo_orders` indicates when your next order is expected. Within the attributes, you can also see any future orders.
+The sensor `jumbo_orders` indicates when your next order is expected. Within the attributes (more info dialog), you can also see any future orders.
+
+#### Time Slots
+The sensor `jumbo_time_slots` indicates the next available time slot. Within the attributes (more info dialog), you can also see any future time slots.
 
 ### Debugging
 If you experience unexpected output, please create an issue with additional logging. You can add the following lines to enable logging

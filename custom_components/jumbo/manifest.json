@@ -1,7 +1,7 @@
 {
   "domain": "jumbo",
   "name": "Jumbo Sensor",
-  "documentation": "https://github.com/peternijssen/python-jumbo-api",
+  "documentation": "https://github.com/peternijssen/home-asssistant-jumbo",
   "codeowners": ["@peternijssen"],
-  "requirements": ["python-jumbo-api==0.2.0"]
+  "requirements": ["python-jumbo-api==0.3.1"]
 }
