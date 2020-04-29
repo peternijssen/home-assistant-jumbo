@@ -27,13 +27,14 @@ ORDER_NAME = "jumbo_orders"
 TIME_SLOT_ICON = "mdi:calendar-clock"
 TIME_SLOT_NAME = "jumbo_time_slots"
 
-VERSION = '0.3.0'
+VERSION = '0.4.0'
 
 ATTRIBUTION = "Information provided by Jumbo.com"
 
 ATTR_ATTRIBUTION = "attribution"
 ATTR_ORDERS = "orders"
 ATTR_TIME_SLOTS = "time_slots"
+ATTR_PRICE = "price"
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
@@ -93,6 +94,7 @@ class BasketSensor(Entity):
         self._data = data
         self._attributes = {
             ATTR_ATTRIBUTION: ATTRIBUTION,
+            ATTR_PRICE: None,
         }
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
@@ -101,6 +103,7 @@ class BasketSensor(Entity):
         await self._data.async_update()
 
         self._state = self._data.basket.amount
+        self._attributes[ATTR_PRICE] = vars(self._data.basket.price)
 
     @property
     def name(self):
@@ -145,6 +148,9 @@ class OrderSensor(Entity):
 
         orders = self._data.open_deliveries
         for order in orders:
+            ### TODO: Not happy with this solution
+            p = vars(order.price)
+            order.price = p
             self._attributes[ATTR_ORDERS].append(vars(order))
 
         if len(orders) > 0:
@@ -196,6 +202,9 @@ class TimeSlotSensor(Entity):
 
         time_slots = self._data.open_time_slots
         for time_slot in time_slots:
+            ### TODO: Not happy with this solution
+            p = vars(time_slot.price)
+            time_slot.price = p
             self._attributes[ATTR_TIME_SLOTS].append(vars(time_slot))
 
         if len(time_slots) > 0:
