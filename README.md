@@ -28,6 +28,9 @@ The sensor `jumbo_orders` indicates when your next order is expected. Within the
 #### Time Slots
 The sensor `jumbo_time_slots` indicates the next available time slot. Within the attributes (more info dialog), you can also see any future time slots.
 
+### Lovelace Card
+A dedicated lovelace card was created by @Voxxie, which can be found within HACS or [here](https://github.com/Voxxie/lovelace-jumbo-card).
+
 ### Debugging
 If you experience unexpected output, please create an issue with additional logging. You can add the following lines to enable logging
 
