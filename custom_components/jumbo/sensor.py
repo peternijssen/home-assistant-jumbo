@@ -14,7 +14,7 @@ from homeassistant.const import (
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
 
-MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=60)
+MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=15)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -26,8 +26,6 @@ ORDER_NAME = "jumbo_orders"
 
 TIME_SLOT_ICON = "mdi:calendar-clock"
 TIME_SLOT_NAME = "jumbo_time_slots"
-
-VERSION = '0.4.0'
 
 ATTRIBUTION = "Information provided by Jumbo.com"
 
