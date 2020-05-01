@@ -3,7 +3,6 @@
 import logging
 from datetime import timedelta
 
-from jumbo_api.jumbo_api import JumboApi, UnauthorizedException
 import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 from homeassistant.components.sensor import PLATFORM_SCHEMA
@@ -13,24 +12,34 @@ from homeassistant.const import (
 )
 from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
+from jumbo_api.jumbo_api import JumboApi, UnauthorizedException
 
 MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=15)
 
 _LOGGER = logging.getLogger(__name__)
 
+CONF_FULFILMENT_TYPE = "type"
+
 BASKET_ICON = "mdi:basket"
 BASKET_NAME = "jumbo_basket"
 
-ORDER_ICON = "mdi:truck-delivery"
-ORDER_NAME = "jumbo_orders"
+DELIVERY_ICON = "mdi:truck-delivery"
+DELIVERY_NAME = "jumbo_delivery"
 
-TIME_SLOT_ICON = "mdi:calendar-clock"
-TIME_SLOT_NAME = "jumbo_time_slots"
+PICK_UP_ICON = "mdi:store"
+PICK_UP_NAME = "jumbo_pick_up"
+
+DELIVERY_TIME_SLOT_ICON = "mdi:calendar-clock"
+DELIVERY_TIME_SLOT_NAME = "jumbo_delivery_time_slots"
+
+PICK_UP_TIME_SLOT_ICON = "mdi:calendar-clock"
+PICK_UP_TIME_SLOT_NAME = "jumbo_pick_up_time_slots"
 
 ATTRIBUTION = "Information provided by Jumbo.com"
 
 ATTR_ATTRIBUTION = "attribution"
-ATTR_ORDERS = "orders"
+ATTR_DELIVERIES = "deliveries"
+ATTR_PICK_UPS = "pick_ups"
 ATTR_TIME_SLOTS = "time_slots"
 ATTR_PRICE = "price"
 
@@ -38,6 +47,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
         vol.Required(CONF_USERNAME): cv.string,
         vol.Required(CONF_PASSWORD): cv.string,
+        vol.Optional(CONF_FULFILMENT_TYPE, default='both'): cv.string,
     }
 )
 
@@ -46,6 +56,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     """Set up the Jumbo sensor."""
     username = config.get(CONF_USERNAME)
     password = config.get(CONF_PASSWORD)
+    fulfilment_type = config.get(CONF_FULFILMENT_TYPE)
 
     try:
         api = JumboApi(username, password)
@@ -58,8 +69,14 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     data = JumboData(hass, config, api)
 
     async_add_entities([BasketSensor(data)], True)
-    async_add_entities([OrderSensor(data)], True)
-    async_add_entities([TimeSlotSensor(data)], True)
+
+    if fulfilment_type in ['delivery', 'both']:
+        async_add_entities([DeliverySensor(data)], True)
+        async_add_entities([DeliveryTimeSlotSensor(data)], True)
+
+    if fulfilment_type in ['pick_up', 'both']:
+        async_add_entities([PickUpSensor(data)], True)
+        async_add_entities([PickUpTimeSlotSensor(data)], True)
 
 
 class JumboData:
@@ -70,8 +87,9 @@ class JumboData:
         self._api = api
         self.basket = None
         self.open_deliveries = {}
-        self.closed_deliveries = {}
-        self.open_time_slots = {}
+        self.open_pick_ups = {}
+        self.open_delivery_time_slots = {}
+        self.open_pick_up_time_slots = {}
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def async_update(self):
@@ -79,8 +97,9 @@ class JumboData:
         _LOGGER.debug("Updating Jumbo data")
         self.basket = self._api.get_basket()
         self.open_deliveries = self._api.get_open_deliveries()
-        self.closed_deliveries = self._api.get_closed_deliveries()
-        self.open_time_slots = self._api.get_open_time_slots()
+        self.open_pick_ups = self._api.get_open_pick_ups()
+        self.open_delivery_time_slots = self._api.get_open_delivery_time_slots()
+        self.open_pick_up_time_slots = self._api.get_open_pick_up_time_slots()
 
 
 class BasketSensor(Entity):
@@ -124,8 +143,8 @@ class BasketSensor(Entity):
         return self._attributes
 
 
-class OrderSensor(Entity):
-    """Order Sensor class."""
+class DeliverySensor(Entity):
+    """Delivery Sensor class."""
 
     def __init__(self, data):
         self.attr = {}
@@ -133,7 +152,7 @@ class OrderSensor(Entity):
         self._data = data
         self._attributes = {
             ATTR_ATTRIBUTION: ATTRIBUTION,
-            ATTR_ORDERS: [],
+            ATTR_DELIVERIES: [],
         }
 
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
@@ -141,26 +160,26 @@ class OrderSensor(Entity):
         """Update the sensor."""
         await self._data.async_update()
 
-        self._attributes[ATTR_ORDERS] = []
+        self._attributes[ATTR_DELIVERIES] = []
         self._state = None
 
-        orders = self._data.open_deliveries
-        for order in orders:
-            ### TODO: Not happy with this solution
-            p = vars(order.price)
-            order.price = p
-            self._attributes[ATTR_ORDERS].append(vars(order))
+        deliveries = self._data.open_deliveries
+        for delivery in deliveries:
+            # TODO: Not happy with this solution
+            p = vars(delivery.price)
+            delivery.price = p
+            self._attributes[ATTR_DELIVERIES].append(vars(delivery))
 
-        if len(orders) > 0:
-            first = next(iter(orders))
-            self._state = first.delivery_date + " " + first.delivery_time
+        if len(deliveries) > 0:
+            first = next(iter(deliveries))
+            self._state = first.status.lower()
         else:
             self._state = None
 
     @property
     def name(self):
         """Return the name of the sensor."""
-        return ORDER_NAME
+        return DELIVERY_NAME
 
     @property
     def state(self):
@@ -170,7 +189,7 @@ class OrderSensor(Entity):
     @property
     def icon(self):
         """Return the icon of the sensor."""
-        return ORDER_ICON
+        return DELIVERY_ICON
 
     @property
     def device_state_attributes(self):
@@ -178,8 +197,62 @@ class OrderSensor(Entity):
         return self._attributes
 
 
-class TimeSlotSensor(Entity):
-    """Time Slot Sensor class."""
+class PickUpSensor(Entity):
+    """Pick Up Sensor class."""
+
+    def __init__(self, data):
+        self.attr = {}
+        self._state = None
+        self._data = data
+        self._attributes = {
+            ATTR_ATTRIBUTION: ATTRIBUTION,
+            ATTR_PICK_UPS: [],
+        }
+
+    @Throttle(MIN_TIME_BETWEEN_UPDATES)
+    async def async_update(self):
+        """Update the sensor."""
+        await self._data.async_update()
+
+        self._attributes[ATTR_PICK_UPS] = []
+        self._state = None
+
+        pick_ups = self._data.open_pick_ups
+        for pick_up in pick_ups:
+            # TODO: Not happy with this solution
+            p = vars(pick_up.price)
+            pick_up.price = p
+            self._attributes[ATTR_PICK_UPS].append(vars(pick_up))
+
+        if len(pick_ups) > 0:
+            first = next(iter(pick_ups))
+            self._state = first.status.lower()
+        else:
+            self._state = None
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return PICK_UP_NAME
+
+    @property
+    def state(self):
+        """Return the state of the sensor."""
+        return self._state
+
+    @property
+    def icon(self):
+        """Return the icon of the sensor."""
+        return PICK_UP_ICON
+
+    @property
+    def device_state_attributes(self):
+        """Return the state attributes."""
+        return self._attributes
+
+
+class DeliveryTimeSlotSensor(Entity):
+    """Delivery Time Slot Sensor class."""
 
     def __init__(self, data):
         self.attr = {}
@@ -198,9 +271,9 @@ class TimeSlotSensor(Entity):
         self._attributes[ATTR_TIME_SLOTS] = []
         self._state = None
 
-        time_slots = self._data.open_time_slots
+        time_slots = self._data.open_delivery_time_slots
         for time_slot in time_slots:
-            ### TODO: Not happy with this solution
+            # TODO: Not happy with this solution
             p = vars(time_slot.price)
             time_slot.price = p
             self._attributes[ATTR_TIME_SLOTS].append(vars(time_slot))
@@ -214,7 +287,7 @@ class TimeSlotSensor(Entity):
     @property
     def name(self):
         """Return the name of the sensor."""
-        return TIME_SLOT_NAME
+        return DELIVERY_TIME_SLOT_NAME
 
     @property
     def state(self):
@@ -224,7 +297,61 @@ class TimeSlotSensor(Entity):
     @property
     def icon(self):
         """Return the icon of the sensor."""
-        return TIME_SLOT_ICON
+        return DELIVERY_TIME_SLOT_ICON
+
+    @property
+    def device_state_attributes(self):
+        """Return the state attributes."""
+        return self._attributes
+
+
+class PickUpTimeSlotSensor(Entity):
+    """Pick Up Time Slot Sensor class."""
+
+    def __init__(self, data):
+        self.attr = {}
+        self._state = None
+        self._data = data
+        self._attributes = {
+            ATTR_ATTRIBUTION: ATTRIBUTION,
+            ATTR_TIME_SLOTS: [],
+        }
+
+    @Throttle(MIN_TIME_BETWEEN_UPDATES)
+    async def async_update(self):
+        """Update the sensor."""
+        await self._data.async_update()
+
+        self._attributes[ATTR_TIME_SLOTS] = []
+        self._state = None
+
+        time_slots = self._data.open_pick_up_time_slots
+        for time_slot in time_slots:
+            # TODO: Not happy with this solution
+            p = vars(time_slot.price)
+            time_slot.price = p
+            self._attributes[ATTR_TIME_SLOTS].append(vars(time_slot))
+
+        if len(time_slots) > 0:
+            first = next(iter(time_slots))
+            self._state = first.start_date_time
+        else:
+            self._state = None
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return PICK_UP_TIME_SLOT_NAME
+
+    @property
+    def state(self):
+        """Return the state of the sensor."""
+        return self._state
+
+    @property
+    def icon(self):
+        """Return the icon of the sensor."""
+        return PICK_UP_TIME_SLOT_ICON
 
     @property
     def device_state_attributes(self):

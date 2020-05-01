@@ -1,10 +1,10 @@
 
-## Home Assisant sensor component for Jumbo.com
+# Home Assisant sensor component for Jumbo.com
 
 Provides Home Assistant sensors for Jumbo (Dutch Supermarket).
 This library is not affiliated with Jumbo and retrieves data from the endpoints of the mobile application. Use at your own risk.
 
-### Install
+## Install
 Use HACS to install these sensors or copy the files in the /custom_components/jumbo/ folder to [homeassistant]/config/custom_components/jumbo/
 
 Example config:
@@ -14,24 +14,65 @@ Example config:
     - platform: jumbo
       username: <username>            (required)
       password: <password>            (required)
+      type: "both"                    (optional) (Choose from "delivery", "pick_up" or "both")
 ```
 
-### Usage
-Three sensors will be created:
+## Sensors
+Depending on the type you defined, you will get several sensors.
 
 #### Basket
-The sensor `jumbo_basket` indicates how many items you still have within your basket at this point.
+The sensor `jumbo_basket` indicates how many items you still have within your basket. Within the more dialog window you will also see the outstanding costs that you have.
 
-#### Orders
-The sensor `jumbo_orders` indicates when your next order is expected. Within the attributes (more info dialog), you can also see any future orders.
+#### Deliveries
+The sensor `jumbo_delivery` indicates the state of your next upcoming delivery. The states are `open`, `processing` and `ready_to_deliver`.
+Within the attributes (more info dialog), you can also see any future deliveries.
 
-#### Time Slots
-The sensor `jumbo_time_slots` indicates the next available time slot. Within the attributes (more info dialog), you can also see any future time slots.
+The sensor `jumbo_delivery_time_slots` indicates the next available delivery time slot. Within the attributes (more info dialog), you can also see any future delivery time slots.
 
-### Lovelace Card
+#### Pick ups
+The sensor `jumbo_pick_up` indicates the state of your next upcoming pick up. The states are `open`, `processing` and `ready_to_pick_up`.
+Within the attributes (more info dialog), you can also see any future pick ups.
+
+The sensor `jumbo_pick_up_time_slots` indicates the next available pick up time slot. Within the attributes (more info dialog), you can also see any future pick up time slots.
+
+## Automation Examples (Untested!)
+If you want to know when you delivery order is being processed:
+```
+- alias: jumbo_delivery_processing
+  initial_state: 'on'
+  trigger:
+    platform: state
+    entity_id: sensor.jumbo_delivery
+    to: 'processing'
+  action:
+    - service: notify.telegram_peter
+      data:
+        title: 'Jumbo'
+        message: 'De Jumbo verwerkt momenteel je bestelling. Je kunt deze niet meer wijzigen!'
+```
+
+If you want to know when you delivery order is ready for delivery:
+```
+- alias: jumbo_delivery_ready
+  initial_state: 'on'
+  trigger:
+    platform: state
+    entity_id: sensor.jumbo_delivery
+    to: 'ready_to_deliver'
+  action:
+    - service: notify.telegram_peter
+      data:
+        title: 'Jumbo'
+        message: 'De Jumbo heeft je bestelling verwerkt. Hij is nu klaar voor vertrek!'
+```
+
+## Community
+Share your thoughts  within [this topic](https://community.home-assistant.io/t/jumbo-com-integration-dutch-supermarket/190438).
+
+## Lovelace Card
 A dedicated lovelace card was created by @Voxxie, which can be found within HACS or [here](https://github.com/Voxxie/lovelace-jumbo-card).
 
-### Debugging
+## Debugging
 If you experience unexpected output, please create an issue with additional logging. You can add the following lines to enable logging
 
 ```
