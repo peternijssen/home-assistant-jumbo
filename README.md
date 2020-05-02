@@ -39,16 +39,16 @@ The sensor `jumbo_pick_up_time_slots` indicates the next available pick up time 
 If you want to know when you delivery order is being processed:
 ```
 - alias: jumbo_delivery_processing
-  initial_state: 'on'
+  initial_state: "on"
   trigger:
     platform: state
     entity_id: sensor.jumbo_delivery
     to: 'processing'
   action:
-    - service: notify.telegram_peter
-      data:
-        title: 'Jumbo'
-        message: 'De Jumbo verwerkt momenteel je bestelling. Je kunt deze niet meer wijzigen!'
+    service: notify.telegram_peter
+    data_template:
+      title: "Jumbo"
+      message: "De Jumbo verwerkt momenteel je bestelling. Je levering wordt tussen {% raw %}{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].time }}{% endraw %} verwacht"
 ```
 
 If you want to know when you delivery order is ready for delivery:
@@ -58,12 +58,12 @@ If you want to know when you delivery order is ready for delivery:
   trigger:
     platform: state
     entity_id: sensor.jumbo_delivery
-    to: 'ready_to_deliver'
+    to: "ready_to_deliver"
   action:
     - service: notify.telegram_peter
       data:
-        title: 'Jumbo'
-        message: 'De Jumbo heeft je bestelling verwerkt. Hij is nu klaar voor vertrek!'
+        title: "Jumbo"
+        message: "De Jumbo heeft je bestelling verwerkt. Hij is nu klaar voor vertrek!"
 ```
 
 ## Community
