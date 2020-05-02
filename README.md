@@ -1,5 +1,8 @@
+# Home Assisant component for Jumbo.com
 
-# Home Assisant sensor component for Jumbo.com
+
+[![](https://img.shields.io/github/release/peternijssen/home-assistant-jumbo.svg?style=flat-square)](https://github.com/peternijssen/home-assistant-jumbo/releases/latest)
+[![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs) 
 
 Provides Home Assistant sensors for Jumbo (Dutch Supermarket).
 This library is not affiliated with Jumbo and retrieves data from the endpoints of the mobile application. Use at your own risk.
