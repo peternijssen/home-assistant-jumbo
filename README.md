@@ -84,7 +84,7 @@ If you want to know when you delivery order is ready for delivery:
 ```
 
 ## Lovelace
-A dedicated lovelace card was created by @Voxxie, which can be found within HACS or [here](https://github.com/Voxxie/lovelace-jumbo-card).
+A dedicated lovelace card was created by [@Voxxie](https://github.com/Voxxie), which can be found within HACS or [here](https://github.com/Voxxie/lovelace-jumbo-card).
 
 You can also work with the data directly like so:
 ```
