@@ -69,11 +69,17 @@ If you want to know when you delivery order is ready for delivery:
         message: "De Jumbo heeft je bestelling verwerkt. Hij is nu klaar voor vertrek!"
 ```
 
+## Lovelace
+A dedicated lovelace card was created by @Voxxie, which can be found within HACS or [here](https://github.com/Voxxie/lovelace-jumbo-card).
+
+You can also work with the data directly like so:
+```
+- type: markdown
+  content: "De volgende Jumbo levering is op **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].date }}** tussen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].time }}**. Huidige status: **{{ states('sensor.jumbo_delivery') }}**"
+```
+
 ## Community
 Share your thoughts  within [this topic](https://community.home-assistant.io/t/jumbo-com-integration-dutch-supermarket/190438).
-
-## Lovelace Card
-A dedicated lovelace card was created by @Voxxie, which can be found within HACS or [here](https://github.com/Voxxie/lovelace-jumbo-card).
 
 ## Debugging
 If you experience unexpected output, please create an issue with additional logging. You can add the following lines to enable logging
