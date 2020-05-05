@@ -38,7 +38,7 @@ Within the attributes (more info dialog), you can also see any future pick ups.
 
 The sensor `jumbo_pick_up_time_slots` indicates the next available pick up time slot. Within the attributes (more info dialog), you can also see any future pick up time slots.
 
-## Automation Examples (Untested!)
+## Automation Examples
 If you want a 48h warning up front before your delivery is coming (A [Date & Time Sensor](https://www.home-assistant.io/integrations/time_date/) is required):
 ```
 - alias: jumbo_warning
