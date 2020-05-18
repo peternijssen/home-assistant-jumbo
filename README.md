@@ -38,7 +38,21 @@ Within the attributes (more info dialog), you can also see any future pick ups.
 
 The sensor `jumbo_pick_up_time_slots` indicates the next available pick up time slot. Within the attributes (more info dialog), you can also see any future pick up time slots.
 
-## Automation Examples (Untested!)
+## Automation Examples
+If you want a 48h warning up front before your delivery is coming (A [Date & Time Sensor](https://www.home-assistant.io/integrations/time_date/) is required):
+```
+- alias: jumbo_warning
+  initial_state: "on"
+  trigger:
+    platform: template
+    value_template: "{{ (state_attr('sensor.jumbo_delivery', 'deliveries')[0].start_time.timestamp() - 172800) == strptime(states('sensor.date_time'), '%Y-%m-%d, %H:%M').timestamp() }}"
+  action:
+    service: notify.telegram_peter
+    data:
+      title: "Jumbo"
+      message: "Binnen 48 uur komt de Jumbo. Is de bestelling compleet?"
+```
+
 If you want to know when you delivery order is being processed:
 ```
 - alias: jumbo_delivery_processing
@@ -69,11 +83,17 @@ If you want to know when you delivery order is ready for delivery:
         message: "De Jumbo heeft je bestelling verwerkt. Hij is nu klaar voor vertrek!"
 ```
 
+## Lovelace
+A dedicated lovelace card was created by [@Voxxie](https://github.com/Voxxie), which can be found within HACS or [here](https://github.com/Voxxie/lovelace-jumbo-card).
+
+You can also work with the data directly like so:
+```
+- type: markdown
+  content: "De volgende Jumbo levering is op **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].date }}** tussen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].time }}**. Huidige status: **{{ states('sensor.jumbo_delivery') }}**"
+```
+
 ## Community
 Share your thoughts  within [this topic](https://community.home-assistant.io/t/jumbo-com-integration-dutch-supermarket/190438).
-
-## Lovelace Card
-A dedicated lovelace card was created by @Voxxie, which can be found within HACS or [here](https://github.com/Voxxie/lovelace-jumbo-card).
 
 ## Debugging
 If you experience unexpected output, please create an issue with additional logging. You can add the following lines to enable logging
