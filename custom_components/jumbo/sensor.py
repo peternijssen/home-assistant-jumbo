@@ -85,6 +85,7 @@ class JumboData:
     def __init__(self, hass, config, api):
         """Initialize the data object."""
         self._api = api
+        self.hass = hass
         self.basket = None
         self.open_deliveries = {}
         self.open_pick_ups = {}
@@ -94,6 +95,9 @@ class JumboData:
     @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def async_update(self):
         """Update data."""
+        await self.hass.async_add_executor_job(self._get_data)
+
+    def _get_data(self):
         _LOGGER.debug("Updating Jumbo data")
         self.basket = self._api.get_basket()
         self.open_deliveries = self._api.get_open_deliveries()
