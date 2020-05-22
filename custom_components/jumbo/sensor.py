@@ -58,14 +58,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     password = config.get(CONF_PASSWORD)
     fulfilment_type = config.get(CONF_FULFILMENT_TYPE)
 
-    try:
-        api = JumboApi(username, password)
-        _LOGGER.debug("Connection with Jumbo API succeeded")
-
-    except UnauthorizedException:
-        _LOGGER.exception("Can't connect to the Jumbo API")
-        return
-
+    api = JumboApi(username, password)
     data = JumboData(hass, config, api)
 
     async_add_entities([BasketSensor(data)], True)
@@ -98,12 +91,15 @@ class JumboData:
         await self.hass.async_add_executor_job(self._get_data)
 
     def _get_data(self):
-        _LOGGER.debug("Updating Jumbo data")
-        self.basket = self._api.get_basket()
-        self.open_deliveries = self._api.get_open_deliveries()
-        self.open_pick_ups = self._api.get_open_pick_ups()
-        self.open_delivery_time_slots = self._api.get_open_delivery_time_slots()
-        self.open_pick_up_time_slots = self._api.get_open_pick_up_time_slots()
+        try:
+            self.basket = self._api.get_basket()
+            self.open_deliveries = self._api.get_open_deliveries()
+            self.open_pick_ups = self._api.get_open_pick_ups()
+            self.open_delivery_time_slots = self._api.get_open_delivery_time_slots()
+            self.open_pick_up_time_slots = self._api.get_open_pick_up_time_slots()
+            _LOGGER.debug("Updated data from Jumbo")
+        except UnauthorizedException:
+            _LOGGER.error("Can't connect to the Jumbo API. Is your username/password valid?")
 
 
 class BasketSensor(Entity):
@@ -122,6 +118,9 @@ class BasketSensor(Entity):
     async def async_update(self):
         """Update the sensor."""
         await self._data.async_update()
+
+        if self._data.basket is None:
+            return
 
         self._state = self._data.basket.amount
         self._attributes[ATTR_PRICE] = vars(self._data.basket.price)
