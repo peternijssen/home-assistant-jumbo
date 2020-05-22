@@ -89,7 +89,13 @@ A dedicated lovelace card was created by [@Voxxie](https://github.com/Voxxie), w
 You can also work with the data directly like so:
 ```
 - type: markdown
-  content: "De volgende Jumbo levering is op **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].date }}** tussen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].time }}**. Huidige status: **{{ states('sensor.jumbo_delivery') }}**"
+  content: "
+  {% if state_attr('sensor.jumbo_delivery', 'deliveries') %}
+  De volgende Jumbo levering is op **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].date }}** tussen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].time }}**. Huidige status: **{{ states('sensor.jumbo_delivery') }}**
+  {% else %}
+  Geen openstaande bestellingen bij Jumbo
+  {% endif %}
+  "
 ```
 
 ## Community

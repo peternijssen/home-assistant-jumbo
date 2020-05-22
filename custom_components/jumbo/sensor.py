@@ -114,7 +114,6 @@ class BasketSensor(Entity):
             ATTR_PRICE: None,
         }
 
-    @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def async_update(self):
         """Update the sensor."""
         await self._data.async_update()
@@ -158,7 +157,6 @@ class DeliverySensor(Entity):
             ATTR_DELIVERIES: [],
         }
 
-    @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def async_update(self):
         """Update the sensor."""
         await self._data.async_update()
@@ -169,8 +167,9 @@ class DeliverySensor(Entity):
         deliveries = self._data.open_deliveries
         for delivery in deliveries:
             # TODO: Not happy with this solution
-            p = vars(delivery.price)
-            delivery.price = p
+            if not isinstance(delivery.price,dict):
+                p = vars(delivery.price)
+                delivery.price = p
             self._attributes[ATTR_DELIVERIES].append(vars(delivery))
 
         if len(deliveries) > 0:
@@ -212,7 +211,6 @@ class PickUpSensor(Entity):
             ATTR_PICK_UPS: [],
         }
 
-    @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def async_update(self):
         """Update the sensor."""
         await self._data.async_update()
@@ -223,8 +221,9 @@ class PickUpSensor(Entity):
         pick_ups = self._data.open_pick_ups
         for pick_up in pick_ups:
             # TODO: Not happy with this solution
-            p = vars(pick_up.price)
-            pick_up.price = p
+            if not isinstance(pick_up.price,dict):
+                p = vars(pick_up.price)
+                pick_up.price = p
             self._attributes[ATTR_PICK_UPS].append(vars(pick_up))
 
         if len(pick_ups) > 0:
@@ -266,7 +265,6 @@ class DeliveryTimeSlotSensor(Entity):
             ATTR_TIME_SLOTS: [],
         }
 
-    @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def async_update(self):
         """Update the sensor."""
         await self._data.async_update()
@@ -277,8 +275,9 @@ class DeliveryTimeSlotSensor(Entity):
         time_slots = self._data.open_delivery_time_slots
         for time_slot in time_slots:
             # TODO: Not happy with this solution
-            p = vars(time_slot.price)
-            time_slot.price = p
+            if not isinstance(time_slot.price,dict):
+                p = vars(time_slot.price)
+                time_slot.price = p
             self._attributes[ATTR_TIME_SLOTS].append(vars(time_slot))
 
         if len(time_slots) > 0:
@@ -320,7 +319,6 @@ class PickUpTimeSlotSensor(Entity):
             ATTR_TIME_SLOTS: [],
         }
 
-    @Throttle(MIN_TIME_BETWEEN_UPDATES)
     async def async_update(self):
         """Update the sensor."""
         await self._data.async_update()
@@ -331,8 +329,9 @@ class PickUpTimeSlotSensor(Entity):
         time_slots = self._data.open_pick_up_time_slots
         for time_slot in time_slots:
             # TODO: Not happy with this solution
-            p = vars(time_slot.price)
-            time_slot.price = p
+            if not isinstance(time_slot.price,dict):
+                p = vars(time_slot.price)
+                time_slot.price = p
             self._attributes[ATTR_TIME_SLOTS].append(vars(time_slot))
 
         if len(time_slots) > 0:
