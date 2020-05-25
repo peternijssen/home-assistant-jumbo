@@ -4,7 +4,8 @@
 [![](https://img.shields.io/github/release/peternijssen/home-assistant-jumbo.svg?style=flat-square)](https://github.com/peternijssen/home-assistant-jumbo/releases/latest)
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-orange.svg)](https://github.com/custom-components/hacs) 
 
-Provides Home Assistant sensors for Jumbo (Dutch Supermarket).
+Provides Home Assistant sensors for Jumbo (Dutch Supermarket) based on the [python-jumbo-api](https://github.com/peternijssen/python-jumbo-api) repository.
+
 This library is not affiliated with Jumbo and retrieves data from the endpoints of the mobile application. Use at your own risk.
 
 ## Install
@@ -45,7 +46,7 @@ If you want a 24h warning up front before your delivery is being processed (A [D
   initial_state: "on"
   trigger:
     platform: template
-    value_template: "{{ (state_attr('sensor.jumbo_delivery', 'deliveries')[0].cut_off_date.timestamp() - 86400) == strptime(states('sensor.date_time'), '%Y-%m-%d, %H:%M').timestamp() }}"
+    value_template: "{% if state_attr('sensor.jumbo_delivery', 'deliveries') %}{{ (state_attr('sensor.jumbo_delivery', 'deliveries')[0].cut_off_date.timestamp() - 86400) == strptime(states('sensor.date_time'), '%Y-%m-%d, %H:%M').timestamp() }}{% endif %}"
   action:
     service: notify.telegram_peter
     data:
@@ -59,7 +60,7 @@ If you want a 1h warning up front before your delivery is being processed while 
   initial_state: "on"
   trigger:
     platform: template
-    value_template: "{{ (state_attr('sensor.jumbo_delivery', 'deliveries')[0].cut_off_date.timestamp() - 3600) == strptime(states('sensor.date_time'), '%Y-%m-%d, %H:%M').timestamp() }}"
+    value_template: "{% if state_attr('sensor.jumbo_delivery', 'deliveries') %}{{ (state_attr('sensor.jumbo_delivery', 'deliveries')[0].cut_off_date.timestamp() - 3600) == strptime(states('sensor.date_time'), '%Y-%m-%d, %H:%M').timestamp() }}{% endif %}"
   condition:
     condition: numeric_state
     entity_id: 'sensor.jumbo_basket'
@@ -78,6 +79,7 @@ If you want to know when you delivery order is being processed:
   trigger:
     platform: state
     entity_id: sensor.jumbo_delivery
+    from: 'open'
     to: 'processing'
   action:
     service: notify.telegram_peter
@@ -93,7 +95,8 @@ If you want to know when you delivery order is ready for delivery:
   trigger:
     platform: state
     entity_id: sensor.jumbo_delivery
-    to: "ready_to_deliver"
+    from: 'processing'
+    to: 'ready_to_deliver'
   action:
     - service: notify.telegram_peter
       data:
