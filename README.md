@@ -116,8 +116,8 @@ You can also work with the data directly like so:
   "
 ```
 
-## Community
-Share your thoughts  within [this topic](https://community.home-assistant.io/t/jumbo-com-integration-dutch-supermarket/190438).
+## Questions / Feedback
+Share your thoughts within [this topic](https://community.home-assistant.io/t/jumbo-com-integration-dutch-supermarket/190438).
 
 ## Debugging
 If you experience unexpected output, please create an issue with additional logging. You can add the following lines to enable logging

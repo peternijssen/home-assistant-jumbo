@@ -13,7 +13,10 @@ See the [repository](https://github.com/peternijssen/home-assistant-jumbo) for a
       type: "both"                    (optional) (Choose from "delivery", "pick_up" or "both")
 ```
 
-[For more information visit the repository](https://github.com/peternijssen/home-asssistant-jumbo)
+[For more information visit the repository.](https://github.com/peternijssen/home-asssistant-jumbo)
+
+### Questions / Feedback
+Share your thoughts within [this topic](https://community.home-assistant.io/t/jumbo-com-integration-dutch-supermarket/190438).
 
 ### Lovelace Card
 A dedicated lovelace card was created by @Voxxie, which can be found within HACS or [here](https://github.com/Voxxie/lovelace-jumbo-card).
