@@ -1,6 +1,7 @@
-## Home Assisant sensor component for Jumbo.com
+## Home Assistant sensor component for Jumbo.com
 
-Provides Home Assistant sensors for Jumbo.com (Dutch Supermarket)
+Provides Home Assistant sensors for Jumbo.com (Dutch Supermarket).
+See the [repository](https://github.com/peternijssen/home-assistant-jumbo) for automation examples.
 
 ### Example config:
 

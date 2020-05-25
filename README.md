@@ -1,4 +1,4 @@
-# Home Assisant component for Jumbo.com
+# Home Assistant component for Jumbo.com
 
 
 [![](https://img.shields.io/github/release/peternijssen/home-assistant-jumbo.svg?style=flat-square)](https://github.com/peternijssen/home-assistant-jumbo/releases/latest)
@@ -39,18 +39,36 @@ Within the attributes (more info dialog), you can also see any future pick ups.
 The sensor `jumbo_pick_up_time_slots` indicates the next available pick up time slot. Within the attributes (more info dialog), you can also see any future pick up time slots.
 
 ## Automation Examples
-If you want a 48h warning up front before your delivery is coming (A [Date & Time Sensor](https://www.home-assistant.io/integrations/time_date/) is required):
+If you want a 24h warning up front before your delivery is being processed (A [Date & Time Sensor](https://www.home-assistant.io/integrations/time_date/) is required):
 ```
-- alias: jumbo_warning
+- alias: jumbo_24h_warning
   initial_state: "on"
   trigger:
     platform: template
-    value_template: "{{ (state_attr('sensor.jumbo_delivery', 'deliveries')[0].start_time.timestamp() - 172800) == strptime(states('sensor.date_time'), '%Y-%m-%d, %H:%M').timestamp() }}"
+    value_template: "{{ (state_attr('sensor.jumbo_delivery', 'deliveries')[0].cut_off_date.timestamp() - 86400) == strptime(states('sensor.date_time'), '%Y-%m-%d, %H:%M').timestamp() }}"
   action:
     service: notify.telegram_peter
     data:
       title: "Jumbo"
-      message: "Binnen 48 uur komt de Jumbo. Is de bestelling compleet?"
+      message: "Je hebt nog 24 uur voordat je bestelling wordt verwerkt. Is de bestelling compleet?"
+```
+
+If you want a 1h warning up front before your delivery is being processed while you still have items in your basket (A [Date & Time Sensor](https://www.home-assistant.io/integrations/time_date/) is required):
+```
+- alias: jumbo_1h_warning
+  initial_state: "on"
+  trigger:
+    platform: template
+    value_template: "{{ (state_attr('sensor.jumbo_delivery', 'deliveries')[0].cut_off_date.timestamp() - 3600) == strptime(states('sensor.date_time'), '%Y-%m-%d, %H:%M').timestamp() }}"
+  condition:
+    condition: numeric_state
+    entity_id: 'sensor.jumbo_basket'
+    above: 0
+  action:
+    service: notify.telegram_peter
+    data:
+      title: "Jumbo"
+      message: "Je hebt nog 1 uur om je bestelling bij de Jumbo aan te passen. Er staan nog {{ states('sensor.jumbo_basket') }} producten in je mandje."
 ```
 
 If you want to know when you delivery order is being processed:
