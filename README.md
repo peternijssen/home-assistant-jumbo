@@ -127,7 +127,7 @@ If you experience unexpected output, please create an issue with additional logg
 
 ```
 logger:
-  default: info
+  default: error
   logs:
       custom_components.jumbo: debug
 ```
