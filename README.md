@@ -110,13 +110,16 @@ A dedicated lovelace card was created by [@Voxxie](https://github.com/Voxxie), w
 You can also work with the data directly like so:
 ```
 - type: markdown
-  content: "
-  {% if state_attr('sensor.jumbo_delivery', 'deliveries') %}
-  De volgende Jumbo levering is op **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].date }}** tussen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].time }}**. Huidige status: **{{ states('sensor.jumbo_delivery') }}**
-  {% else %}
-  Geen openstaande bestellingen bij Jumbo
-  {% endif %}
-  "
+  content: >
+    {% if state_attr('sensor.jumbo_delivery', 'deliveries') %}
+      De volgende Jumbo levering is op **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].date }}** tussen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].time }}**. De huidige status is: **{{ states('sensor.jumbo_delivery') }}**. De totale kosten bedragen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].price.format }}**. 
+      {% if states('sensor.jumbo_delivery') == 'open' %}
+      Je kunt je bestelling nog aanpassen tot **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].cut_off_date }}**
+      {% endif %}
+    {% endif %}
+    {% if states('sensor.jumbo_basket') != 0 %}
+      Je hebt nog **{{ states('sensor.jumbo_basket') }}** producten in je winkelmandje met een totale waarde van **{{ state_attr('sensor.jumbo_basket', 'price').format }}**
+    {% endif %}
 ```
 
 ## Questions / Feedback
@@ -127,7 +130,7 @@ If you experience unexpected output, please create an issue with additional logg
 
 ```
 logger:
-  default: info
+  default: error
   logs:
       custom_components.jumbo: debug
 ```
