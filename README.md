@@ -133,6 +133,7 @@ logger:
   default: error
   logs:
       custom_components.jumbo: debug
+      jumbo_api.jumbo_api: debug
 ```
 
 ## Contributors
