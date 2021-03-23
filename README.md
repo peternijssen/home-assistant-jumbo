@@ -85,7 +85,7 @@ If you want to know when you delivery order is being processed:
     service: notify.telegram_peter
     data_template:
       title: "Jumbo"
-      message: "De Jumbo verwerkt momenteel je bestelling. Je levering wordt tussen {% raw %}{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].time }}{% endraw %} verwacht"
+      message: "De Jumbo verwerkt momenteel je bestelling. Je levering wordt tussen {% raw %}{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].eta_start }}{% endraw %} en {% raw %}{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].eta_end }}{% endraw %} verwacht"
 ```
 
 If you want to know when you delivery order is ready for delivery:
@@ -101,7 +101,7 @@ If you want to know when you delivery order is ready for delivery:
     - service: notify.telegram_peter
       data:
         title: "Jumbo"
-        message: "De Jumbo heeft je bestelling verwerkt. Hij is nu klaar voor vertrek!"
+        message: "De Jumbo heeft je bestelling verwerkt. Hij is nu klaar voor vertrek en wordt verwacht om {% raw %}{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].eta_live }}{% endraw %}"
 ```
 
 ## Lovelace
@@ -111,15 +111,19 @@ You can also work with the data directly like so:
 ```
 - type: markdown
   content: >
-    {% if state_attr('sensor.jumbo_delivery', 'deliveries') %}
-      De volgende Jumbo levering is op **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].date }}** tussen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].time }}**. De huidige status is: **{{ states('sensor.jumbo_delivery') }}**. De totale kosten bedragen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].price.format }}**. 
-      {% if states('sensor.jumbo_delivery') == 'open' %}
-      Je kunt je bestelling nog aanpassen tot **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].cut_off_date }}**
+      {% if state_attr('sensor.jumbo_delivery', 'deliveries') %}
+        De volgende Jumbo levering is op **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].date }}** tussen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].time }}**. De huidige status is: **{{ states('sensor.jumbo_delivery') }}**. De totale kosten bedragen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].price.format }}**. 
+        {% if states('sensor.jumbo_delivery') == 'open' %}
+        Je kunt je bestelling nog aanpassen tot **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].cut_off_date }}**
+        {% elif states('sensor.jumbo_delivery') == 'processing'  %}
+        Je bestelling wordt verwacht tussen {{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].eta_start }} en {{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].eta_end }}
+        {% elif states('sensor.jumbo_delivery') == 'ready_to_deliver' %}
+        Je bestelling wordt geleverd om {{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].eta_live }}
+        {% endif %}            
       {% endif %}
-    {% endif %}
-    {% if states('sensor.jumbo_basket') != 0 %}
-      Je hebt nog **{{ states('sensor.jumbo_basket') }}** producten in je winkelmandje met een totale waarde van **{{ state_attr('sensor.jumbo_basket', 'price').format }}**
-    {% endif %}
+      {% if states('sensor.jumbo_basket') != 0 %}
+        Je hebt nog **{{ states('sensor.jumbo_basket') }}** producten in je winkelmandje met een totale waarde van **{{ state_attr('sensor.jumbo_basket', 'price').format }}**
+      {% endif %}
 ```
 
 ## Questions / Feedback

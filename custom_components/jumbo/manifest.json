@@ -3,5 +3,6 @@
   "name": "Jumbo Sensor",
   "documentation": "https://github.com/peternijssen/home-asssistant-jumbo",
   "codeowners": ["@peternijssen"],
-  "requirements": ["python-jumbo-api==0.6.1"]
+  "requirements": ["python-jumbo-api==0.7.0"],
+  "version": "0.7.0"
 }
