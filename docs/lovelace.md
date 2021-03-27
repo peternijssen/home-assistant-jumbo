@@ -4,13 +4,13 @@ This markdown card automatically displays information based on the state of your
 - type: markdown
   content: >
       {% if state_attr('sensor.jumbo_delivery', 'deliveries') %}
-        De volgende Jumbo levering is op **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].date }}** tussen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].time }}**. De huidige status is: **{{ states('sensor.jumbo_delivery') }}**. De totale kosten bedragen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].price.format }}**. 
         {% if states('sensor.jumbo_delivery') == 'open' %}
+        De volgende Jumbo levering is op **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].date }}** tussen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].time }}**.
         Je kunt je bestelling nog aanpassen tot **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].cut_off_date }}**
         {% elif states('sensor.jumbo_delivery') == 'processing'  %}
-        Je bestelling wordt verwacht tussen {{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].start_time }} en {{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].end_time }}
+        Je bestelling wordt verwacht tussen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].start_time }}** en **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].end_time }}** op **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].date }}**
         {% elif states('sensor.jumbo_delivery') == 'ready_to_deliver' %}
-        Je bestelling wordt geleverd tussen {{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].eta_start }} en {{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].eta_end }}. Waarschijnlijk rond {{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].eta_live }}.
+        Je bestelling wordt geleverd tussen **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].eta_start }}** en **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].eta_end }}**. Waarschijnlijk rond **{{ state_attr('sensor.jumbo_delivery', 'deliveries')[0].eta_live }}**.
         {% endif %}            
       {% endif %}
       {% if states('sensor.jumbo_basket') != 0 %}
