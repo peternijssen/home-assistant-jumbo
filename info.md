@@ -1,7 +1,7 @@
 ## Home Assistant sensor component for Jumbo.com
 
 Provides Home Assistant sensors for Jumbo.com (Dutch Supermarket).
-See the [repository](https://github.com/peternijssen/home-assistant-jumbo) for automation examples.
+See the [repository](https://github.com/peternijssen/home-assistant-jumbo) for Automation & Lovelace examples.
 
 ### Example config:
 
@@ -13,7 +13,8 @@ See the [repository](https://github.com/peternijssen/home-assistant-jumbo) for a
       type: "both"                    (optional) (Choose from "delivery", "pick_up" or "both")
 ```
 
-[For more information visit the repository.](https://github.com/peternijssen/home-asssistant-jumbo)
+### Documentation
+For all options and examples, see the [Documentation](https://github.com/peternijssen/home-asssistant-jumbo).
 
 ### Questions / Feedback
 Share your thoughts within [this topic](https://community.home-assistant.io/t/jumbo-com-integration-dutch-supermarket/190438).

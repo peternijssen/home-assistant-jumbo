@@ -14,7 +14,7 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.util import Throttle
 from jumbo_api.jumbo_api import JumboApi, UnauthorizedException
 
-MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=15)
+MIN_TIME_BETWEEN_UPDATES = timedelta(minutes=5)
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -22,6 +22,9 @@ CONF_FULFILMENT_TYPE = "type"
 
 BASKET_ICON = "mdi:basket"
 BASKET_NAME = "jumbo_basket"
+
+LIVE_ICON = "mdi:progress-clock"
+LIVE_NAME = "jumbo_live"
 
 DELIVERY_ICON = "mdi:truck-delivery"
 DELIVERY_NAME = "jumbo_delivery"
@@ -42,6 +45,8 @@ ATTR_DELIVERIES = "deliveries"
 ATTR_PICK_UPS = "pick_ups"
 ATTR_TIME_SLOTS = "time_slots"
 ATTR_PRICE = "price"
+ATTR_ETA_START = "eta_start"
+ATTR_ETA_END = "eta_end"
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
@@ -64,6 +69,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     async_add_entities([BasketSensor(data)], True)
 
     if fulfilment_type in ['delivery', 'both']:
+        async_add_entities([LiveSensor(data)], True)
         async_add_entities([DeliverySensor(data)], True)
         async_add_entities([DeliveryTimeSlotSensor(data)], True)
 
@@ -138,6 +144,56 @@ class BasketSensor(Entity):
     def icon(self):
         """Return the icon of the sensor."""
         return BASKET_ICON
+
+    @property
+    def device_state_attributes(self):
+        """Return the state attributes."""
+        return self._attributes
+
+
+class LiveSensor(Entity):
+    """Live Sensor class."""
+
+    def __init__(self, data):
+        self.attr = {}
+        self._state = None
+        self._data = data
+        self._attributes = {
+            ATTR_ATTRIBUTION: ATTRIBUTION,
+            ATTR_ETA_START: None,
+            ATTR_ETA_END: None
+        }
+
+    async def async_update(self):
+        """Update the sensor."""
+        await self._data.async_update()
+
+        self._attributes[ATTR_ETA_START] = None
+        self._attributes[ATTR_ETA_END] = None
+        self._state = None
+
+        deliveries = self._data.open_deliveries
+        if 0 not in deliveries:
+            return
+
+        self._state = deliveries[0].eta_live
+        self._attributes[ATTR_ETA_START] = deliveries[0].eta_start
+        self._attributes[ATTR_ETA_END] = deliveries[0].eta_end
+
+    @property
+    def name(self):
+        """Return the name of the sensor."""
+        return LIVE_NAME
+
+    @property
+    def state(self):
+        """Return the state of the sensor."""
+        return self._state
+
+    @property
+    def icon(self):
+        """Return the icon of the sensor."""
+        return LIVE_ICON
 
     @property
     def device_state_attributes(self):

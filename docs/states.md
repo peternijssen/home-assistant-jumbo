@@ -1,4 +1,4 @@
-## States
+# States
 Here is the list through which states a delivery / pick up goes:
 
 | State | Description | When |
