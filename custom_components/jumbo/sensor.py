@@ -173,12 +173,13 @@ class LiveSensor(Entity):
         self._state = None
 
         deliveries = self._data.open_deliveries
-        if 0 not in deliveries:
+        if len(deliveries) == 0:
             return
 
-        self._state = deliveries[0].eta_live
-        self._attributes[ATTR_ETA_START] = deliveries[0].eta_start
-        self._attributes[ATTR_ETA_END] = deliveries[0].eta_end
+        delivery = next(iter(deliveries))
+        self._state = delivery.eta_live
+        self._attributes[ATTR_ETA_START] = delivery.eta_start
+        self._attributes[ATTR_ETA_END] = delivery.eta_end
 
     @property
     def name(self):
