@@ -146,7 +146,7 @@ class BasketSensor(Entity):
         return BASKET_ICON
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the state attributes."""
         return self._attributes
 
@@ -197,7 +197,7 @@ class LiveSensor(Entity):
         return LIVE_ICON
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the state attributes."""
         return self._attributes
 
@@ -251,7 +251,7 @@ class DeliverySensor(Entity):
         return DELIVERY_ICON
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the state attributes."""
         return self._attributes
 
@@ -305,7 +305,7 @@ class PickUpSensor(Entity):
         return PICK_UP_ICON
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the state attributes."""
         return self._attributes
 
@@ -359,7 +359,7 @@ class DeliveryTimeSlotSensor(Entity):
         return DELIVERY_TIME_SLOT_ICON
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the state attributes."""
         return self._attributes
 
@@ -413,6 +413,6 @@ class PickUpTimeSlotSensor(Entity):
         return PICK_UP_TIME_SLOT_ICON
 
     @property
-    def device_state_attributes(self):
+    def extra_state_attributes(self):
         """Return the state attributes."""
         return self._attributes
